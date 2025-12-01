@@ -3,40 +3,36 @@ using BlazingPizza.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+// Add services
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-
-// App services
-builder.Services.AddSingleton<PizzaService>(); // Provides pizza data
-builder.Services.AddScoped<PizzaSalesState>(); // Tracks pizzas sold
-builder.Services.AddHttpClient();
+builder.Services.AddSingleton<PizzaService>();
+builder.Services.AddScoped<PizzaSalesState>();
 builder.Services.AddScoped<OrderState>();
-
-// Database
+builder.Services.AddHttpClient();
 builder.Services.AddSqlite<PizzaStoreContext>("Data Source=pizza.db");
-
-// Add API support
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// Middleware pipeline
+// Middleware
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
-
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
 // Map endpoints
 app.MapRazorPages();
 app.MapBlazorHub();
-app.MapControllers(); // Enables API endpoints
+app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}"); // MVC
+app.MapControllers(); // API
 app.MapFallbackToPage("/_Host");
 
-// Initialize database
+// Initialize the database
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<PizzaStoreContext>();

@@ -1,7 +1,14 @@
-namespace BlazingPizza.Data
+public class PizzaSalesState
 {
-    public class PizzaSalesState
+    public int PizzasSoldToday { get; set; } = 0;
+
+    public event Action OnChange;
+
+    public void Increment()
     {
-        public int PizzasSoldToday { get; set; }
+        PizzasSoldToday++;
+        NotifyStateChanged();
     }
+
+    private void NotifyStateChanged() => OnChange?.Invoke();
 }

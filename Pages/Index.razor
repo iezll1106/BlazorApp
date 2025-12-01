@@ -3,15 +3,24 @@
 @inject NavigationManager NavigationManager
 @using BlazingPizza.Services
 @inject OrderState OrderState
+@inject PizzaSalesState SalesState
 
 <div class="main">
     <h1>Blazing Pizzas</h1>
-    <ul class="pizza-cards">
-        @if (specials != null)
-        {
+
+    <!-- Display total pizzas sold -->
+    <p>Total pizzas sold today: @SalesState.PizzasSoldToday</p>
+
+    @if (specials == null)
+    {
+        <p>Loading pizzas...</p>
+    }
+    else
+    {
+        <ul class="pizza-cards">
             @foreach (var special in specials)
             {
-                <li @onclick="@(() => OrderState.ShowConfigurePizzaDialog(special))" 
+                <li @onclick="@(() => { OrderState.ShowConfigurePizzaDialog(special); SalesState.Increment(); })" 
                     style="background-image: url('@special.ImageUrl')">
                     <div class="pizza-info">
                         <span class="title">@special.Name</span>
@@ -20,8 +29,8 @@
                     </div>
                 </li>
             }
-        }
-    </ul>
+        </ul>
+    }
 </div>
 
 @if (OrderState.ShowingConfigureDialog)
@@ -33,10 +42,27 @@
 }
 
 @code {
-    List<PizzaSpecial> specials = new();
+    List<PizzaSpecial> specials;
 
     protected override async Task OnInitializedAsync()
     {
-        specials = await HttpClient.GetFromJsonAsync<List<PizzaSpecial>>(NavigationManager.BaseUri + "specials");
+        // Subscribe to AppState changes to auto-update the counter
+        SalesState.OnChange += StateHasChanged;
+
+        try
+        {
+            specials = await HttpClient.GetFromJsonAsync<List<PizzaSpecial>>(NavigationManager.BaseUri + "specials");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error loading pizza specials: {ex.Message}");
+            specials = new List<PizzaSpecial>(); // fallback
+        }
+    }
+
+    public void Dispose()
+    {
+        // Unsubscribe to prevent memory leaks
+        SalesState.OnChange -= StateHasChanged;
     }
 }
