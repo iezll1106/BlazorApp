@@ -1,0 +1,16 @@
+@page "/pizzasales"
+@inject BlazingPizza.Data.PizzaSalesState SalesState
+
+<h1>Welcome to Blazing Pizzas</h1>
+
+<p>Today, we've sold this many pizzas: @SalesState.PizzasSoldToday</p>
+
+<button class="btn btn-primary" @onclick="IncrementSales">Buy a Pizza</button>
+
+@code {
+    private void IncrementSales()
+    {
+        // Update the shared AppState property
+        SalesState.PizzasSoldToday++;
+    }
+}

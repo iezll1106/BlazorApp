@@ -1,0 +1,31 @@
+@page "/pizzas"
+@using BlazingPizza.Data
+@inject PizzaService PizzaSvc
+@inject PizzaSalesState SalesState
+
+<h1>Choose your pizza</h1>
+<p>We have all these delicious recipes:</p>
+
+@if (todaysPizzas == null)
+{
+    <p>Loading pizzas...</p>
+}
+else
+{
+    @foreach (var pizza in todaysPizzas)
+    {
+        <PizzaItem Pizza="@pizza" />  <!-- Pass fully qualified Pizza -->
+    }
+}
+
+<hr />
+<p>Total pizzas sold today: @SalesState.PizzasSoldToday</p>
+
+@code {
+    private BlazingPizza.Data.Pizza[] todaysPizzas;  // fully qualified
+
+    protected override async Task OnInitializedAsync()
+    {
+        todaysPizzas = await PizzaSvc.GetPizzasAsync();
+    }
+}

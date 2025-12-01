@@ -1,0 +1,19 @@
+@using BlazingPizza.Data
+@inject PizzaSalesState SalesState
+
+<div class="card m-2 p-2">
+    <h3>@Pizza.Name</h3>
+    <p>@Pizza.Description</p>
+    <p>Price: @Pizza.Price.ToString("0.00")</p>
+    <button class="btn btn-primary" @onclick="BuyPizza">Buy</button>
+</div>
+
+@code {
+    [Parameter]
+    public BlazingPizza.Data.Pizza Pizza { get; set; }  // fully qualified type
+
+    private void BuyPizza()
+    {
+        SalesState.PizzasSoldToday++;
+    }
+}

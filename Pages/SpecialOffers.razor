@@ -1,0 +1,12 @@
+@page "/specialoffers"
+@using Microsoft.AspNetCore.Components
+@using BlazingPizza.Pages  <!-- Namespace of SpecialOffer component -->
+
+<h1>Special Offers</h1>
+
+<!-- CascadingValue passes the deal to all descendant components -->
+<CascadingValue Value="@("Throwback Thursday")">
+    <SpecialOffer />  <!-- Child component that consumes the cascading value -->
+</CascadingValue>
+
+<p>Some additional info on the deal can go here.</p>
